@@ -1,5 +1,7 @@
 """Static file generator for Django."""
 import os
+import stat
+import tempfile
 from django.http import HttpRequest
 from django.core.handlers.base import BaseHandler
 from django.db.models.base import ModelBase
@@ -141,9 +143,12 @@ class StaticGenerator(object):
                 raise StaticGeneratorException('Could not create the directory: %s' % directory)
         
         try:
-            f = open(fn, 'w')
-            f.write(content)
-            f.close()
+            f, tmpname = tempfile.mkstemp(dir=directory)
+            os.write(f, content)
+            os.close(f)
+            os.chmod(tmpname, stat.S_IREAD | stat.S_IWRITE | stat.S_IWUSR | stat.S_IRUSR | stat.S_IWUSR | stat.S_IRGRP | stat.S_IROTH)
+            os.rename(tmpname, fn)
+            
         except:
             raise StaticGeneratorException('Could not create the file: %s' % fn)
             
