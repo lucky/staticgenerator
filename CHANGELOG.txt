@@ -1,3 +1,7 @@
+2009-05-09, v1.3.4
+
+    - Atomic file writes
+
 2008-08-19, v1.3.3
 
     - Update to request.path_info (see Django rev #8015)
