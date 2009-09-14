@@ -4,21 +4,11 @@
 """Static file generator for Django."""
 import stat
 
-from django.core.handlers.base import BaseHandler
 from django.utils.functional import Promise
 
 from filesystem import FileSystem
+from handlers import DummyHandler
 
-class DummyHandler(BaseHandler):
-    """Required to process request and response middleware"""
-
-    def __call__(self, request):
-        self.load_middleware()
-        response = self.get_response(request)
-        for middleware_method in self._response_middleware:
-            response = middleware_method(request, response)
-
-        return response
 
 class StaticGeneratorException(Exception):
     pass

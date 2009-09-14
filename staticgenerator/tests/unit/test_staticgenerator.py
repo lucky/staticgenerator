@@ -1,15 +1,17 @@
 #!/usr/bin/env python
 #-*- coding:utf-8 -*-
-from staticgenerator.staticgenerator import StaticGenerator, StaticGeneratorException
-import staticgenerator.staticgenerator
-from mox import Mox
+
 import stat
+
+from mox import Mox
+
+from staticgenerator.staticgenerator import StaticGenerator, StaticGeneratorException, DummyHandler
+import staticgenerator.staticgenerator
 
 class CustomSettings(object):
     def __init__(self, **kw):
         for k,v in kw.iteritems():
             setattr(self, k, v)
-
 
 def get_mocks(mox):
     http_request_mock = mox.CreateMockAnything()
@@ -593,3 +595,18 @@ def test_delete_loops_through_all_resources():
     instance.delete()
 
     mox.VerifyAll()
+    
+def test_can_create_dummy_handler():
+
+    mox = Mox()
+    handler = DummyHandler()
+    
+    handler.load_middleware = lambda: True
+    handler.get_response = lambda request: 'bar'
+    
+    middleware_method = lambda request, response: (request, response)
+    
+    handler._response_middleware = [middleware_method]
+    result = handler('foo')
+    
+    assert result == ('foo', 'bar')
