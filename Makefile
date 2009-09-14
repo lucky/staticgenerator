@@ -8,6 +8,7 @@ clean:
 	
 unit: clean
 	@echo "Running unit tests..."
-	@nosetests -d -s --verbose --with-coverage --cover-inclusive --cover-package=staticgenerator \
-		staticgenerator/tests/unit
+	@export PYTHONPATH=`pwd`:`pwd`/staticgenerator::$$PYTHONPATH && \
+		nosetests -d -s --verbose --with-coverage --cover-inclusive --cover-package=staticgenerator \
+			staticgenerator/tests/unit
 	
