@@ -280,6 +280,10 @@ def test_get_filename_from_path():
     settings = CustomSettings(WEB_ROOT="test_web_root")
     
     path_mock = '/foo/bar'
+    
+    fs_mock = mox.CreateMockAnything()
+    fs_mock.join("test_web_root", "foo/bar").AndReturn("test_web_root/foo/bar")
+    fs_mock.dirname("test_web_root/foo/bar").AndReturn("test_web_root/foo")
 
     mox.ReplayAll()
     
@@ -288,7 +292,8 @@ def test_get_filename_from_path():
                                manager=manager,
                                model=model,
                                queryset=queryset,
-                               settings=settings)
+                               settings=settings,
+                               fs=fs_mock)
 
     result = instance.get_filename_from_path(path_mock)
     
@@ -300,6 +305,10 @@ def test_get_filename_from_path_when_path_ends_with_slash():
     http_request, model_base, manager, model, queryset = get_mocks(mox)
     settings = CustomSettings(WEB_ROOT="test_web_root")
     
+    fs_mock = mox.CreateMockAnything()
+    fs_mock.join("test_web_root", "foo/bar/index.html").AndReturn("test_web_root/foo/bar/index.html")
+    fs_mock.dirname("test_web_root/foo/bar/index.html").AndReturn("test_web_root/foo/bar")
+    
     path_mock = '/foo/bar/'
 
     mox.ReplayAll()
@@ -309,7 +318,8 @@ def test_get_filename_from_path_when_path_ends_with_slash():
                                manager=manager,
                                model=model,
                                queryset=queryset,
-                               settings=settings)
+                               settings=settings,
+                               fs=fs_mock)
 
     result = instance.get_filename_from_path(path_mock)
     
@@ -321,6 +331,8 @@ def test_publish_raises_when_unable_to_create_folder():
     http_request, model_base, manager, model, queryset = get_mocks(mox)
 
     fs_mock = mox.CreateMockAnything()
+    fs_mock.join("test_web_root", "some_path").AndReturn("test_web_root/some_path")
+    fs_mock.dirname("test_web_root/some_path").AndReturn("test_web_root")
     fs_mock.exists("test_web_root").AndReturn(False)
 
     fs_mock.makedirs("test_web_root").AndRaise(ValueError())
@@ -351,6 +363,8 @@ def test_publish_raises_when_unable_to_create_temp_file():
     http_request, model_base, manager, model, queryset = get_mocks(mox)
 
     fs_mock = mox.CreateMockAnything()
+    fs_mock.join("test_web_root", "some_path").AndReturn("test_web_root/some_path")
+    fs_mock.dirname("test_web_root/some_path").AndReturn("test_web_root")
     fs_mock.exists("test_web_root").AndReturn(True)
 
     fs_mock.tempfile(dir="test_web_root").AndRaise(ValueError())
@@ -381,6 +395,8 @@ def test_publish_from_path():
     http_request, model_base, manager, model, queryset = get_mocks(mox)
 
     fs_mock = mox.CreateMockAnything()
+    fs_mock.join("test_web_root", "some_path").AndReturn("test_web_root/some_path")
+    fs_mock.dirname("test_web_root/some_path").AndReturn("test_web_root")
     fs_mock.exists("test_web_root").AndReturn(True)
 
     f = mox.CreateMockAnything()
@@ -413,6 +429,8 @@ def test_delete_raises_when_unable_to_delete_file():
 
     fs_mock = mox.CreateMockAnything()
 
+    fs_mock.join("test_web_root", "some_path").AndReturn("test_web_root/some_path")
+    fs_mock.dirname("test_web_root/some_path").AndReturn("test_web_root")
     fs_mock.exists("test_web_root/some_path").AndReturn(True)
     fs_mock.remove("test_web_root/some_path").AndRaise(ValueError())
 
@@ -443,6 +461,8 @@ def test_delete_ignores_folder_delete_when_unable_to_delete_folder():
 
     fs_mock = mox.CreateMockAnything()
 
+    fs_mock.join("test_web_root", "some_path").AndReturn("test_web_root/some_path")
+    fs_mock.dirname("test_web_root/some_path").AndReturn("test_web_root")
     fs_mock.exists("test_web_root/some_path").AndReturn(True)
     fs_mock.remove("test_web_root/some_path")
 
@@ -469,6 +489,8 @@ def test_delete_from_path():
     http_request, model_base, manager, model, queryset = get_mocks(mox)
 
     fs_mock = mox.CreateMockAnything()
+    fs_mock.join("test_web_root", "some_path").AndReturn("test_web_root/some_path")
+    fs_mock.dirname("test_web_root/some_path").AndReturn("test_web_root")
     fs_mock.exists("test_web_root/some_path").AndReturn(True)
     fs_mock.remove("test_web_root/some_path")
 
@@ -496,6 +518,8 @@ def test_publish_loops_through_all_resources():
 
     fs_mock = mox.CreateMockAnything()
     f = mox.CreateMockAnything()
+    fs_mock.join('test_web_root', 'some_path_1').AndReturn('test_web_root/some_path_1')
+    fs_mock.dirname('test_web_root/some_path_1').AndReturn('test_web_root')
     fs_mock.exists("test_web_root").AndReturn(True)
     filename = "some_temp_file"
     fs_mock.tempfile(dir="test_web_root").AndReturn([f, filename])
@@ -504,6 +528,8 @@ def test_publish_loops_through_all_resources():
     fs_mock.chmod(filename, stat.S_IREAD | stat.S_IWRITE | stat.S_IWUSR | stat.S_IRUSR | stat.S_IWUSR | stat.S_IRGRP | stat.S_IROTH)
     fs_mock.rename('some_temp_file', 'test_web_root/some_path_1')
 
+    fs_mock.join('test_web_root', 'some_path_2').AndReturn('test_web_root/some_path_2')
+    fs_mock.dirname('test_web_root/some_path_2').AndReturn('test_web_root')
     fs_mock.exists("test_web_root").AndReturn(True)
     filename = "some_temp_file"
     fs_mock.tempfile(dir="test_web_root").AndReturn([f, filename])
@@ -539,10 +565,14 @@ def test_delete_loops_through_all_resources():
     http_request, model_base, manager, model, queryset = get_mocks(mox)
 
     fs_mock = mox.CreateMockAnything()
+    fs_mock.join('test_web_root', 'some_path').AndReturn("test_web_root/some_path")
+    fs_mock.dirname("test_web_root/some_path").AndReturn("test_web_root")
     fs_mock.exists("test_web_root/some_path").AndReturn(True)
     fs_mock.remove("test_web_root/some_path")
     fs_mock.rmdir("test_web_root")
 
+    fs_mock.join('test_web_root', 'some_path_2').AndReturn("test_web_root/some_path_2")
+    fs_mock.dirname('test_web_root/some_path_2').AndReturn("test_web_root")
     fs_mock.exists("test_web_root/some_path_2").AndReturn(True)
     fs_mock.remove("test_web_root/some_path_2")
     fs_mock.rmdir("test_web_root")

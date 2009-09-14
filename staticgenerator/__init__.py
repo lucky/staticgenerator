@@ -2,39 +2,12 @@
 #-*- coding:utf-8 -*-
 
 """Static file generator for Django."""
-import os
 import stat
-import tempfile
+
 from django.core.handlers.base import BaseHandler
 from django.utils.functional import Promise
 
-class FileSystem(object):
-    def exists(self, path):
-        return os.path.exists(path)
-
-    def makedirs(self, path):
-        os.makedirs(path)
-
-    def tempfile(self, directory):
-        return tempfile.mkstemp(dir=directory)
-
-    def write(self, f, content):
-        os.write(f, content)
-
-    def close(self, f):
-        os.close(f)
-
-    def chmod(self, filename, flags):
-        os.chmod(filename, flags)
-
-    def rename(self, from_file, to_file):
-        os.rename(tmpname, filename)
-
-    def remove(self, path):
-        os.remove(path)
-
-    def rmdir(self, directory):
-        os.rmdir(directory)
+from filesystem import FileSystem
 
 class DummyHandler(BaseHandler):
     """Required to process request and response middleware"""
@@ -206,8 +179,8 @@ class StaticGenerator(object):
         if path.endswith('/'):
             path = '%sindex.html' % path
 
-        filename = os.path.join(self.web_root, path.lstrip('/')).encode('utf-8')
-        return filename, os.path.dirname(filename)
+        filename = self.fs.join(self.web_root, path.lstrip('/')).encode('utf-8')
+        return filename, self.fs.dirname(filename)
 
     def publish_from_path(self, path, content=None):
         """
