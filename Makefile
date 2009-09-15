@@ -4,6 +4,8 @@ clean:
 	@rm -rf build
 	@echo "removing (.coverage)"
 	@rm -f .coverage
+	@echo "removing (test_data)"
+	@rm -rf `pwd`/test_data
 	@echo "Done!"
 	
 unit: clean
@@ -14,6 +16,7 @@ unit: clean
 	
 functional: clean
 	@echo "Running unit tests..."
+	@mkdir `pwd`/test_data
 	@export PYTHONPATH=`pwd`:`pwd`/staticgenerator::$$PYTHONPATH && \
 		nosetests -d -s --verbose --with-coverage --cover-inclusive --cover-package=staticgenerator \
 			staticgenerator/tests/functional

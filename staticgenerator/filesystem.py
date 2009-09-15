@@ -15,7 +15,7 @@ class FileSystem(object):
         return tempfile.mkstemp(dir=directory)
 
     def write(self, f, content):
-        os.write(f, content)
+        return os.write(f, content)
 
     def close(self, f):
         os.close(f)
@@ -24,7 +24,7 @@ class FileSystem(object):
         os.chmod(filename, flags)
 
     def rename(self, from_file, to_file):
-        os.rename(tmpname, filename)
+        os.rename(from_file, to_file)
 
     def remove(self, path):
         os.remove(path)
@@ -32,8 +32,10 @@ class FileSystem(object):
     def rmdir(self, directory):
         os.rmdir(directory)
         
-    def join(self, root, path):
-        return os.path.join(root, path.lstrip('/'))
+    def join(self, *paths):
+        if not paths:
+            return ""
+        return os.path.join(paths[0], *[path.lstrip("/") for path in paths[1:]])
         
     def dirname(self, path):
         return os.path.dirname(path)
