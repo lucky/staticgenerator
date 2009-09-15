@@ -12,3 +12,9 @@ unit: clean
 		nosetests -d -s --verbose --with-coverage --cover-inclusive --cover-package=staticgenerator \
 			staticgenerator/tests/unit
 	
+functional: clean
+	@echo "Running unit tests..."
+	@export PYTHONPATH=`pwd`:`pwd`/staticgenerator::$$PYTHONPATH && \
+		nosetests -d -s --verbose --with-coverage --cover-inclusive --cover-package=staticgenerator \
+			staticgenerator/tests/functional
+	
