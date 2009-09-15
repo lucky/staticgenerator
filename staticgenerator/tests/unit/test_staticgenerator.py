@@ -369,7 +369,7 @@ def test_publish_raises_when_unable_to_create_temp_file():
     fs_mock.dirname("test_web_root/some_path").AndReturn("test_web_root")
     fs_mock.exists("test_web_root").AndReturn(True)
 
-    fs_mock.tempfile(dir="test_web_root").AndRaise(ValueError())
+    fs_mock.tempfile(directory="test_web_root").AndRaise(ValueError())
 
     settings = CustomSettings(WEB_ROOT="test_web_root")
 
@@ -403,7 +403,7 @@ def test_publish_from_path():
 
     f = mox.CreateMockAnything()
     filename = "some_temp_file"
-    fs_mock.tempfile(dir="test_web_root").AndReturn([f, filename])
+    fs_mock.tempfile(directory="test_web_root").AndReturn([f, filename])
     fs_mock.write(f, "some_content")
     fs_mock.close(f)
     fs_mock.chmod(filename, stat.S_IREAD | stat.S_IWRITE | stat.S_IWUSR | stat.S_IRUSR | stat.S_IWUSR | stat.S_IRGRP | stat.S_IROTH)
@@ -524,7 +524,7 @@ def test_publish_loops_through_all_resources():
     fs_mock.dirname('test_web_root/some_path_1').AndReturn('test_web_root')
     fs_mock.exists("test_web_root").AndReturn(True)
     filename = "some_temp_file"
-    fs_mock.tempfile(dir="test_web_root").AndReturn([f, filename])
+    fs_mock.tempfile(directory="test_web_root").AndReturn([f, filename])
     fs_mock.write(f, "some_content")
     fs_mock.close(f)
     fs_mock.chmod(filename, stat.S_IREAD | stat.S_IWRITE | stat.S_IWUSR | stat.S_IRUSR | stat.S_IWUSR | stat.S_IRGRP | stat.S_IROTH)
@@ -534,7 +534,7 @@ def test_publish_loops_through_all_resources():
     fs_mock.dirname('test_web_root/some_path_2').AndReturn('test_web_root')
     fs_mock.exists("test_web_root").AndReturn(True)
     filename = "some_temp_file"
-    fs_mock.tempfile(dir="test_web_root").AndReturn([f, filename])
+    fs_mock.tempfile(directory="test_web_root").AndReturn([f, filename])
     fs_mock.write(f, "some_content")
     fs_mock.close(f)
     fs_mock.chmod(filename, stat.S_IREAD | stat.S_IWRITE | stat.S_IWUSR | stat.S_IRUSR | stat.S_IWUSR | stat.S_IRGRP | stat.S_IROTH)

@@ -188,7 +188,7 @@ class StaticGenerator(object):
                 raise StaticGeneratorException('Could not create the directory: %s' % directory)
 
         try:
-            f, tmpname = self.fs.tempfile(dir=directory)
+            f, tmpname = self.fs.tempfile(directory=directory)
             self.fs.write(f, content)
             self.fs.close(f)
             self.fs.chmod(tmpname, stat.S_IREAD | stat.S_IWRITE | stat.S_IWUSR | stat.S_IRUSR | stat.S_IWUSR | stat.S_IRGRP | stat.S_IROTH)
