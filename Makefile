@@ -7,7 +7,14 @@ clean:
 	@echo "removing (test_data)"
 	@rm -rf `pwd`/test_data
 	@echo "Done!"
-	
+
+test: clean
+	@echo "Running all tests..."
+	@mkdir `pwd`/test_data
+	@export PYTHONPATH=`pwd`:`pwd`/staticgenerator::$$PYTHONPATH && \
+		nosetests -d -s --verbose --with-coverage --cover-inclusive --cover-package=staticgenerator \
+			staticgenerator/tests
+
 unit: clean
 	@echo "Running unit tests..."
 	@export PYTHONPATH=`pwd`:`pwd`/staticgenerator::$$PYTHONPATH && \
