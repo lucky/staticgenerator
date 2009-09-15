@@ -34,4 +34,7 @@ class FileSystem(object):
         
     def join(self, root, path):
         return os.path.join(root, path.lstrip('/'))
+        
+    def dirname(self, path):
+        return os.path.dirname(path)
 
