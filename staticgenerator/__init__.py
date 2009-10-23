@@ -151,6 +151,7 @@ class StaticGenerator(object):
         Imitates a basic http request using DummyHandler to retrieve
         resulting output (HTML, XML, whatever)
         """
+
         request = self.http_request()
         request.path_info = path
         request.META.setdefault('SERVER_PORT', 80)
@@ -158,6 +159,9 @@ class StaticGenerator(object):
 
         handler = DummyHandler()
         response = handler(request)
+
+        if int(response.status_code) != 200:
+            raise StaticGeneratorException("The requested page returned http code %d. Static Generation failed." % int(response.status_code))
 
         return response.content
 

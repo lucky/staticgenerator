@@ -35,7 +35,7 @@ def test_can_create_staticgenerator():
                                model=model,
                                queryset=queryset,
                                settings=settings)
-    
+
     assert instance
     assert isinstance(instance, StaticGenerator)
     mox.VerifyAll()
@@ -249,7 +249,8 @@ def test_get_content_from_path():
     
     response_mock = mox.CreateMockAnything()
     response_mock.content = 'foo'
-    
+    response_mock.status_code = 200
+
     http_request.__call__().AndReturn(request_mock)
     
     handler_mock = mox.CreateMockAnything()
@@ -610,3 +611,96 @@ def test_can_create_dummy_handler():
     result = handler('foo')
     
     assert result == ('foo', 'bar')
+
+def test_bad_request_raises_proper_exception():
+    mox = Mox()
+
+    http_request, model_base, manager, model, queryset = get_mocks(mox)
+    settings = CustomSettings(WEB_ROOT="test_web_root")
+
+    path_mock = 'some_path'
+
+    request_mock = mox.CreateMockAnything()
+    request_mock.META = mox.CreateMockAnything()
+    request_mock.META.setdefault('SERVER_PORT', 80)
+    request_mock.META.setdefault('SERVER_NAME', 'localhost')
+
+    http_request.__call__().AndReturn(request_mock)
+
+    response_mock = mox.CreateMockAnything()
+    response_mock.content = 'foo'
+    response_mock.status_code = 500
+
+    handler_mock = mox.CreateMockAnything()
+    handler_mock.__call__().AndReturn(handler_mock)
+    handler_mock.__call__(request_mock).AndReturn(response_mock)
+
+    mox.ReplayAll()
+
+    try:
+        dummy_handler = staticgenerator.staticgenerator.DummyHandler
+        staticgenerator.staticgenerator.DummyHandler = handler_mock
+
+        instance = StaticGenerator(http_request=http_request,
+                                   model_base=model_base,
+                                   manager=manager,
+                                   model=model,
+                                   queryset=queryset,
+                                   settings=settings)
+
+        result = instance.get_content_from_path(path_mock)
+    except StaticGeneratorException, e:
+        assert str(e) == 'The requested page returned http code 500. Static Generation failed.'
+        mox.VerifyAll()
+        return
+    finally:
+        staticgenerator.staticgenerator.DummyHandler = dummy_handler
+
+    assert False, "Shouldn't have gotten this far."
+
+def test_not_found_raises_proper_exception():
+    mox = Mox()
+
+    http_request, model_base, manager, model, queryset = get_mocks(mox)
+    settings = CustomSettings(WEB_ROOT="test_web_root")
+
+    path_mock = 'some_path'
+
+    request_mock = mox.CreateMockAnything()
+    request_mock.META = mox.CreateMockAnything()
+    request_mock.META.setdefault('SERVER_PORT', 80)
+    request_mock.META.setdefault('SERVER_NAME', 'localhost')
+
+    http_request.__call__().AndReturn(request_mock)
+
+    response_mock = mox.CreateMockAnything()
+    response_mock.content = 'foo'
+    response_mock.status_code = 404
+
+    handler_mock = mox.CreateMockAnything()
+    handler_mock.__call__().AndReturn(handler_mock)
+    handler_mock.__call__(request_mock).AndReturn(response_mock)
+
+    mox.ReplayAll()
+
+    try:
+        dummy_handler = staticgenerator.staticgenerator.DummyHandler
+        staticgenerator.staticgenerator.DummyHandler = handler_mock
+
+        instance = StaticGenerator(http_request=http_request,
+                                   model_base=model_base,
+                                   manager=manager,
+                                   model=model,
+                                   queryset=queryset,
+                                   settings=settings)
+
+        result = instance.get_content_from_path(path_mock)
+    except StaticGeneratorException, e:
+        assert str(e) == 'The requested page returned http code 404. Static Generation failed.'
+        mox.VerifyAll()
+        return
+    finally:
+        staticgenerator.staticgenerator.DummyHandler = dummy_handler
+
+    assert False, "Shouldn't have gotten this far."
+
