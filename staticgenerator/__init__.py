@@ -158,7 +158,10 @@ class StaticGenerator(object):
         request.META.setdefault('SERVER_NAME', self.server_name)
 
         handler = DummyHandler()
-        response = handler(request)
+        try:
+            response = handler(request)
+        except Exception, err:
+            raise StaticGeneratorException("The requested page raised an exception. Static Generation failed. Error: %s" % str(err))
 
         if int(response.status_code) != 200:
             raise StaticGeneratorException("The requested page returned http code %d. Static Generation failed." % int(response.status_code))

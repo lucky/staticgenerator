@@ -704,3 +704,45 @@ def test_not_found_raises_proper_exception():
 
     assert False, "Shouldn't have gotten this far."
 
+def test_request_exception_raises_proper_exception():
+    mox = Mox()
+
+    http_request, model_base, manager, model, queryset = get_mocks(mox)
+    settings = CustomSettings(WEB_ROOT="test_web_root")
+
+    path_mock = 'some_path'
+
+    request_mock = mox.CreateMockAnything()
+    request_mock.META = mox.CreateMockAnything()
+    request_mock.META.setdefault('SERVER_PORT', 80)
+    request_mock.META.setdefault('SERVER_NAME', 'localhost')
+
+    http_request.__call__().AndReturn(request_mock)
+
+    handler_mock = mox.CreateMockAnything()
+    handler_mock.__call__().AndReturn(handler_mock)
+    handler_mock.__call__(request_mock).AndRaise(ValueError("exception"))
+
+    mox.ReplayAll()
+
+    try:
+        dummy_handler = staticgenerator.staticgenerator.DummyHandler
+        staticgenerator.staticgenerator.DummyHandler = handler_mock
+
+        instance = StaticGenerator(http_request=http_request,
+                                   model_base=model_base,
+                                   manager=manager,
+                                   model=model,
+                                   queryset=queryset,
+                                   settings=settings)
+
+        result = instance.get_content_from_path(path_mock)
+    except StaticGeneratorException, e:
+        assert str(e) == 'The requested page raised an exception. Static Generation failed. Error: exception'
+        mox.VerifyAll()
+        return
+    finally:
+        staticgenerator.staticgenerator.DummyHandler = dummy_handler
+
+    assert False, "Shouldn't have gotten this far."
+
