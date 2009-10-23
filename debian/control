@@ -1,0 +1,17 @@
+Source: python-staticgenerator
+Section: python
+Priority: optional
+Maintainer: Gabriel Falcão Gonçalves de Moura <gabriel@nacaolivre.org>
+Standards-Version: 3.8.2
+Build-Depends: debhelper (>= 7), python, cdbs, python-setuptools, python-support, python-django (>= 1.0)
+Homepage: http://superjared.com/projects/static-generator/
+
+Package: python-staticgenerator
+Architecture: all
+Depends: ${misc:Depends}, ${python:Depends}, python-django (>= 1.0)
+Recommends:
+Suggests:
+Description: A static page generator for Django
+ StaticGenerator is a Python class for Django that makes it easy to
+ create static files for lightning fast performance
+
