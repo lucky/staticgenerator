@@ -161,10 +161,10 @@ class StaticGenerator(object):
         try:
             response = handler(request)
         except Exception, err:
-            raise StaticGeneratorException("The requested page raised an exception. Static Generation failed. Error: %s" % str(err))
+            raise StaticGeneratorException("The requested page(\"%s\") raised an exception. Static Generation failed. Error: %s" % (path, str(err)))
 
         if int(response.status_code) != 200:
-            raise StaticGeneratorException("The requested page returned http code %d. Static Generation failed." % int(response.status_code))
+            raise StaticGeneratorException("The requested page(\"%s\") returned http code %d. Static Generation failed." % (path, int(response.status_code)))
 
         return response.content
 

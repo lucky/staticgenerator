@@ -650,7 +650,7 @@ def test_bad_request_raises_proper_exception():
 
         result = instance.get_content_from_path(path_mock)
     except StaticGeneratorException, e:
-        assert str(e) == 'The requested page returned http code 500. Static Generation failed.'
+        assert str(e) == 'The requested page("some_path") returned http code 500. Static Generation failed.'
         mox.VerifyAll()
         return
     finally:
@@ -696,7 +696,7 @@ def test_not_found_raises_proper_exception():
 
         result = instance.get_content_from_path(path_mock)
     except StaticGeneratorException, e:
-        assert str(e) == 'The requested page returned http code 404. Static Generation failed.'
+        assert str(e) == 'The requested page("some_path") returned http code 404. Static Generation failed.'
         mox.VerifyAll()
         return
     finally:
@@ -738,7 +738,7 @@ def test_request_exception_raises_proper_exception():
 
         result = instance.get_content_from_path(path_mock)
     except StaticGeneratorException, e:
-        assert str(e) == 'The requested page raised an exception. Static Generation failed. Error: exception'
+        assert str(e) == 'The requested page("some_path") raised an exception. Static Generation failed. Error: exception'
         mox.VerifyAll()
         return
     finally:
