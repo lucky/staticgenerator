@@ -1,0 +1,3 @@
+setup.py
+staticgenerator/__init__.py
+staticgenerator/middleware.py
